@@ -13,12 +13,16 @@ class TravelState(TypedDict):
     thread_id: str
     language: str        # 'vi' (Mặc định) hoặc 'en'
     currency: str        # 'VND' (Mặc định) hoặc 'USD'
-
+    nationality: Optional[str]        # Quốc tịch (VD: Việt Nam, Mỹ, Nhật)
+    starting_location: Optional[str]  # Điểm bắt đầu (VD: Hà Nội, TP.HCM)
+    travel_date: Optional[str]        # Ngày dự định khởi hành (VD: '2026-10-15')
+    duration_days: Optional[int]      # Số ngày du lịch (VD: 3, 5)
+    
     # 2. Input tìm kiếm ban đầu từ người dùng
     user_query: str
     origin_iata: Optional[str]        # Ví dụ: 'HAN', 'SGN'
     destination: Optional[str]        # Ví dụ: 'Đà Nẵng', 'Tokyo'
-    trip_constraints: Dict[str, Any]  # Ngày đi/về, số lượng người, ngân sách...
+    trip_constraints: Dict[str, Any]  # Số lượng người, yêu cầu đặc biệt...
 
     # 3. Kết quả do các Specialist Agents cào & xử lý về
     flight_results: Optional[List[Dict[str, Any]]]
@@ -29,8 +33,7 @@ class TravelState(TypedDict):
 
     # 4. Lịch trình tổng hợp & Trạng thái duyệt Human-in-the-Loop (HITL)
     itinerary_plan: Optional[Dict[str, Any]]
-    hitl_status: Optional[str]  # 'PENDING', 'APPROVED', 'REJECTED', 'CHANGES_REQUESTED'
+    hitl_status: Optional[str]  # 'PASSED', 'WAITING_APPROVAL', 'APPROVED', 'REJECTED', 'CHANGES_REQUESTED', 'BLOCKED'
 
     # 5. Danh sách tin nhắn trao đổi giữa User & các Agents
-    # Annotated with add_messages giúp LangGraph tự động nối (append) tin nhắn mới
     messages: Annotated[List[BaseMessage], add_messages]

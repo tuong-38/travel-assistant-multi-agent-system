@@ -16,7 +16,7 @@ from app.agents.specialists import (
     itinerary_agent_llm
 )
 
-# --- Nodes với Rate Limit Delay (1s) ---
+# --- Nodes ---
 
 async def guardrail_node(state: TravelState):
     user_query = state.get("user_query") or (state["messages"][-1].content if state.get("messages") else "")
@@ -25,7 +25,7 @@ async def guardrail_node(state: TravelState):
     if not guard_result.is_safe:
         return {
             "hitl_status": "BLOCKED",
-            "messages": [AIMessage(content=f"⚠️ Request Blocked: {guard_result.reason}")]
+            "messages": [AIMessage(content=f"⚠️ Yêu cầu bị từ chối / Request Blocked: {guard_result.reason}")]
         }
     return {"hitl_status": "PASSED"}
 
@@ -33,7 +33,7 @@ async def supervisor_node(state: TravelState):
     if state.get("hitl_status") == "BLOCKED":
         return {"hitl_status": "FINISH"}
     
-    await asyncio.sleep(1)  # Nhịp nghỉ tránh vượt Quota API
+    await asyncio.sleep(1)
     result = supervisor_chain.invoke(state)
     return {"hitl_status": result.next_node}
 
@@ -64,7 +64,13 @@ async def budget_node(state: TravelState):
 
 async def itinerary_node(state: TravelState):
     await asyncio.sleep(1)
-    response = itinerary_agent_llm.invoke({"messages": state["messages"]})
+    # Truyền đầy đủ các biến ngữ cảnh vào Prompt template
+    response = itinerary_agent_llm.invoke({
+        "nationality": state.get("nationality", "Việt Nam"),
+        "starting_location": state.get("starting_location", "Hà Nội"),
+        "currency": state.get("currency", "VND"),
+        "messages": state.get("messages", [])
+    })
     return {
         "messages": [response],
         "hitl_status": "WAITING_APPROVAL"

@@ -21,17 +21,18 @@ class Router(BaseModel):
 system_prompt = (
     "You are the Supervisor (Router & Coordinator) of a Multi-Agent Travel System.\n"
     "Based on the conversation history, analyze the last agent output and decide the NEXT step:\n"
-    "- 'TransportAgent': For searching flights, intercity buses, trains, or local transit.\n"
-    "- 'AccommodationAgent': For finding hotels, resorts, homestays, or villas.\n"
+    "- 'TransportAgent': For searching flights, buses, trains, or local transit.\n"
+    "- 'AccommodationAgent': For finding hotels, resorts, or homestays.\n"
     "- 'WeatherAgent': For checking weather forecasts or clothing advice.\n"
     "- 'SocialReviewAgent': For gathering reviews from TikTok, Threads, or Facebook.\n"
-    "- 'BudgetAgent': For currency exchange (VND/USD) and trip budget calculations.\n"
-    "- 'ItineraryAgent': When sufficient information is gathered and it is time to generate a full day-by-day itinerary.\n"
+    "- 'BudgetAgent': For currency exchange and budget calculations.\n"
+    "- 'ItineraryAgent': When sufficient information is gathered to build a full day-by-day plan.\n"
     "- 'FINISH': Only when the request is fully completed."
 )
 
+# Dùng 3.5-flash-lite cho Supervisor (Routing nhanh & nhẹ)
 llm = ChatGoogleGenerativeAI(
-    model="gemini-3.6-flash",
+    model="gemini-3.5-flash-lite",
     google_api_key=os.getenv("GOOGLE_API_KEY")
 )
 
